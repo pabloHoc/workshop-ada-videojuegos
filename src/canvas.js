@@ -3,6 +3,8 @@ var ctx = canvas.getContext("2d");
 // Necesario para que no se vea mal al escalar los sprites
 ctx.imageSmoothingEnabled = false;
 
+var DIMENSION_CELDA = 16;
+
 function crearSprite(ruta, anchoCuadro, altoCuadro) {
   var sprite = new Image();
   sprite.src = ruta;
@@ -41,9 +43,19 @@ function dibujarSprite() {
     ctx.translate(-jugador.spriteActual.anchoCuadro * FACTOR_ESCALADO, 0);
   }
 
+  // Descomentar para ver el sprite completo
+
+  // ctx.fillStyle = "green";
+  // ctx.fillRect(
+  //   jugador.direccion * jugador.x, // pos x del canvas
+  //   jugador.y, // pos y del canvas
+  //   jugador.spriteActual.anchoCuadro * FACTOR_ESCALADO, // ancho del canvas
+  //   jugador.spriteActual.altoCuadro * FACTOR_ESCALADO
+  // );
+
   ctx.drawImage(
     jugador.spriteActual.sprite,
-    jugador.cuadroActual * jugador.spriteActual.anchoCuadro, // pos x de la imagen
+    Math.floor(jugador.cuadroActual) * jugador.spriteActual.anchoCuadro, // pos x de la imagen
     0, // pos y de la imagen
     jugador.spriteActual.anchoCuadro, // ancho de la imagen
     jugador.spriteActual.altoCuadro, // alto de la imagen
@@ -56,7 +68,7 @@ function dibujarSprite() {
   ctx.restore();
 
   // Pasamos al siguiente cuadro
-  jugador.cuadroActual++;
+  jugador.cuadroActual += 0.4;
 
   // Reseteamos animación
   if (jugador.cuadroActual >= cuadros) {
@@ -76,7 +88,6 @@ function dibujarFondo() {
 }
 
 function dibujarNivel() {
-  var DIMENSION_CELDA = 16;
   var ESCALA_CELDA = 2;
   ctx.fillStyle = "black";
 
@@ -101,5 +112,23 @@ function dibujarNivel() {
         );
       }
     }
+  }
+
+  // dibujarGrilla();
+}
+
+function dibujarGrilla() {
+  ctx.strokeStyle = "black";
+  for (let i = 0; i < canvas.height / 32; i++) {
+    ctx.beginPath();
+    ctx.moveTo(0, i * 32);
+    ctx.lineTo(canvas.width, i * 32);
+    ctx.stroke();
+  }
+  for (let i = 0; i < canvas.width / 32; i++) {
+    ctx.beginPath();
+    ctx.moveTo(i * 32, 0);
+    ctx.lineTo(i * 32, canvas.height);
+    ctx.stroke();
   }
 }

@@ -18,13 +18,13 @@ var spritesJugador = {
 
 var jugador = {
   estado: "DESCANSANDO",
-  x: 0,
-  y: 300,
+  x: 300,
+  y: 100,
   velocidad: {
     x: 0,
     y: 0,
   },
-  fuerzaSalto: -15,
+  fuerzaSalto: -20,
   direccion: 1, // 1 -> derecha, -1 izquierda
   cuadroActual: 0,
   spriteActual: spritesJugador.DESCANSANDO,
@@ -35,12 +35,12 @@ var jugador = {
 };
 
 function moverJugadorDerecha() {
-  jugador.velocidad.x = 10;
+  jugador.velocidad.x += 1;
   jugador.direccion = 1;
 }
 
 function moverJugadorIzquierda() {
-  jugador.velocidad.x = -10;
+  jugador.velocidad.x -= 1;
   jugador.direccion = -1;
 }
 

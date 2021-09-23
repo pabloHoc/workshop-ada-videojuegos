@@ -41,12 +41,19 @@ function ejecutarBucle() {
   dibujarSprite();
   procesarControles();
 
+  aplicarFriccion(jugador);
   // DESPLAZAMIENTO = VELOCIDAD x TIEMPO
   jugador.x += jugador.velocidad.x;
+
+  chequearColisionX(jugador);
+
   jugador.y += jugador.velocidad.y;
 
   aplicarGravedad();
-  limitarJugador();
+
+  chequearColisionY(jugador);
+
+  limitarVelocidad(jugador);
   actualizarEstado();
 
   window.requestAnimationFrame(ejecutarBucle);
@@ -54,19 +61,3 @@ function ejecutarBucle() {
 
 // Requerir cuadro de animación
 window.requestAnimationFrame(ejecutarBucle);
-
-function aplicarGravedad() {
-  jugador.velocidad.y += GRAVEDAD;
-}
-
-function limitarJugador() {
-  if (
-    jugador.y + jugador.spriteActual.sprite.height * FACTOR_ESCALADO >=
-    canvas.height
-  ) {
-    jugador.puede.saltar = true;
-    jugador.y =
-      canvas.height - jugador.spriteActual.sprite.height * FACTOR_ESCALADO;
-    jugador.velocidad.y = 0;
-  }
-}

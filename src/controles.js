@@ -9,8 +9,6 @@ function procesarControles() {
     moverJugadorDerecha();
   } else if (Tecla.Izquierda) {
     moverJugadorIzquierda();
-  } else {
-    jugador.velocidad.x = 0;
   }
 
   if (Tecla.Salto) {
