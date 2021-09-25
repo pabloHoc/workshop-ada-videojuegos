@@ -16,63 +16,87 @@ function crearSprite(ruta, anchoCuadro, altoCuadro) {
   };
 }
 
+function actualizarPantalla() {
+  borrarPantalla();
+  dibujarFondo();
+  dibujarNivel();
+
+  dibujarSprite(hongo);
+  dibujarSprite(jugador);
+
+  moverCamara();
+}
+
 function borrarPantalla() {
   // borrar cuadrado
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
-function dibujarSprite() {
+function dibujarSprite(actor) {
   // Calculamos la cantidad de cuadros
   // de la animación dividiendo el ancho total por el ancho de un cuadro
   var cuadros =
-    jugador.spriteActual.sprite.width / jugador.spriteActual.anchoCuadro;
+    actor.spriteActual.sprite.width / actor.spriteActual.anchoCuadro;
+
+  var direccion = actor.direccion;
+
+  if (actor !== jugador) {
+    direccion = -direccion;
+  }
 
   ctx.save();
   // eje x, eje y
-  ctx.scale(jugador.direccion, 1);
+  ctx.scale(direccion, 1);
 
   /**
-   *  Cuando el jugador mira hacia la izquierda
+   *  Cuando el actor mira hacia la izquierda
    *  El canvas se invierte sobre el eje X (lo positivo pasa a ser negativo)
    *  Y el punto de origen del sprite
    *  Pasa a ser del superior izquierdo al superior derecho
    *  Por lo tanto para que el sprite quede en el mismo lugar
    *  Necesitamos moverlo hacia atrás (derecha) el ancho del sprite
    * */
-  if (jugador.direccion === -1) {
-    ctx.translate(-jugador.spriteActual.anchoCuadro * FACTOR_ESCALADO, 0);
+  if (direccion === -1) {
+    ctx.translate(-actor.spriteActual.anchoCuadro * FACTOR_ESCALADO, 0);
   }
+
+  // Actualizo cámara
+  ctx.translate(direccion * -camara.x, camara.y);
 
   // Descomentar para ver el sprite completo
 
-  // ctx.fillStyle = "green";
-  // ctx.fillRect(
-  //   jugador.direccion * jugador.x, // pos x del canvas
-  //   jugador.y, // pos y del canvas
-  //   jugador.spriteActual.anchoCuadro * FACTOR_ESCALADO, // ancho del canvas
-  //   jugador.spriteActual.altoCuadro * FACTOR_ESCALADO
-  // );
+  ctx.fillStyle = "green";
+  ctx.fillRect(
+    direccion * actor.x, // pos x del canvas
+    actor.y, // pos y del canvas
+    actor.spriteActual.anchoCuadro * FACTOR_ESCALADO, // ancho del canvas
+    actor.spriteActual.altoCuadro * FACTOR_ESCALADO
+  );
 
   ctx.drawImage(
-    jugador.spriteActual.sprite,
-    Math.floor(jugador.cuadroActual) * jugador.spriteActual.anchoCuadro, // pos x de la imagen
+    actor.spriteActual.sprite,
+    Math.floor(actor.cuadroActual) * actor.spriteActual.anchoCuadro, // pos x de la imagen
     0, // pos y de la imagen
-    jugador.spriteActual.anchoCuadro, // ancho de la imagen
-    jugador.spriteActual.altoCuadro, // alto de la imagen
-    jugador.direccion * jugador.x, // pos x del canvas
-    jugador.y, // pos y del canvas
-    jugador.spriteActual.anchoCuadro * FACTOR_ESCALADO, // ancho del canvas
-    jugador.spriteActual.altoCuadro * FACTOR_ESCALADO // alto del canvas
+    actor.spriteActual.anchoCuadro, // ancho de la imagen
+    actor.spriteActual.altoCuadro, // alto de la imagen
+    direccion * actor.x, // pos x del canvas
+    actor.y, // pos y del canvas
+    actor.spriteActual.anchoCuadro * FACTOR_ESCALADO, // ancho del canvas
+    actor.spriteActual.altoCuadro * FACTOR_ESCALADO // alto del canvas
   );
 
   ctx.restore();
 
   // Pasamos al siguiente cuadro
-  jugador.cuadroActual += 0.4;
+  actor.cuadroActual += 0.4;
 
   // Reseteamos animación
-  if (jugador.cuadroActual >= cuadros) {
-    jugador.cuadroActual = 0;
+  if (actor.cuadroActual >= cuadros) {
+    if (actor.estado !== "MUERTO") {
+      actor.cuadroActual = 0;
+    } else {
+      actor.cuadroActual = cuadros - 1;
+    }
   }
 }
 
@@ -105,10 +129,10 @@ function dibujarNivel() {
           DIMENSION_CELDA * Math.floor(celda / columnas), // pos y del sprite -> fila en la que esta
           DIMENSION_CELDA,
           DIMENSION_CELDA,
-          j * DIMENSION_CELDA * ESCALA_CELDA,
-          i * DIMENSION_CELDA * ESCALA_CELDA,
-          DIMENSION_CELDA * ESCALA_CELDA,
-          DIMENSION_CELDA * ESCALA_CELDA
+          j * DIMENSION_CELDA * ESCALA_CELDA - camara.x, // pos x en el canvas
+          i * DIMENSION_CELDA * ESCALA_CELDA - camara.y, // pos y en el canvas
+          DIMENSION_CELDA * ESCALA_CELDA, // ancho en el canvas
+          DIMENSION_CELDA * ESCALA_CELDA // alto en el canvas
         );
       }
     }

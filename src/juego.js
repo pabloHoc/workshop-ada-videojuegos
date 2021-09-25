@@ -1,32 +1,44 @@
 var FACTOR_ESCALADO = 2;
 
-var GRAVEDAD = 1;
+function actualizarSprite(actor) {
+  var spritePrevio = actor.spriteActual;
 
-function actualizarSprite() {
-  switch (jugador.estado) {
+  switch (actor.estado) {
     case "DESCANSANDO":
-      jugador.spriteActual = jugador.sprites.DESCANSANDO;
+      actor.spriteActual = actor.sprites.DESCANSANDO;
       break;
     case "SALTANDO":
-      jugador.spriteActual = jugador.sprites.SALTANDO;
+      actor.spriteActual = actor.sprites.SALTANDO;
       break;
     case "CORRIENDO":
-      jugador.spriteActual = jugador.sprites.CORRIENDO;
+      actor.spriteActual = actor.sprites.CORRIENDO;
       break;
+    case "MUERTO":
+      actor.spriteActual = actor.sprites.MUERTO;
+      break;
+  }
+
+  // Resetear el cuadro si cambiamos de sprite
+  if (spritePrevio !== actor.spriteActual) {
+    actor.cuadroActual = 0;
   }
 }
 
-function actualizarEstado() {
-  if (jugador.velocidad.x !== 0) {
-    jugador.estado = "CORRIENDO";
+function actualizarEstado(actor) {
+  if (actor.estado === "MUERTO") {
+    return;
   }
 
-  if (jugador.velocidad.y < 0) {
-    jugador.estado = "SALTANDO";
+  if (actor.velocidad.x !== 0) {
+    actor.estado = "CORRIENDO";
   }
 
-  if (jugador.velocidad.x === 0 && jugador.velocidad.y === 0) {
-    jugador.estado = "DESCANSANDO";
+  if (actor.velocidad.y < 0) {
+    actor.estado = "SALTANDO";
+  }
+
+  if (actor.velocidad.x === 0 && actor.velocidad.y === 0) {
+    actor.estado = "DESCANSANDO";
   }
 }
 
@@ -34,27 +46,31 @@ function actualizarEstado() {
 function ejecutarBucle() {
   // Bucle que se ejecuta muchas veces por segundo
 
-  borrarPantalla();
-  actualizarSprite();
-  dibujarFondo();
-  dibujarNivel();
-  dibujarSprite();
+  actualizarPantalla();
   procesarControles();
 
-  aplicarFriccion(jugador);
-  // DESPLAZAMIENTO = VELOCIDAD x TIEMPO
-  jugador.x += jugador.velocidad.x;
+  actualizarHongo();
 
-  chequearColisionX(jugador);
+  actualizarFisica(jugador);
+  actualizarFisica(hongo);
 
-  jugador.y += jugador.velocidad.y;
+  if (jugador.estado !== "MUERTO" && hongo.estado !== "MUERTO") {
+    if (actoresColisionan(jugador, hongo)) {
+      if (moviendoHaciaAbajo(jugador)) {
+        hongo.velocidad.y = -15;
+        hongo.estado = "MUERTO";
+      } else {
+        jugador.estado = "MUERTO";
+        jugador.velocidad.y = -15;
+      }
+    }
+  }
 
-  aplicarGravedad();
+  actualizarEstado(jugador);
+  actualizarEstado(hongo);
 
-  chequearColisionY(jugador);
-
-  limitarVelocidad(jugador);
-  actualizarEstado();
+  actualizarSprite(jugador);
+  actualizarSprite(hongo);
 
   window.requestAnimationFrame(ejecutarBucle);
 }

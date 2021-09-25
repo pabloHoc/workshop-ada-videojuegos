@@ -14,6 +14,11 @@ var spritesJugador = {
     32,
     32
   ),
+  MUERTO: crearSprite(
+    "recursos/Main Characters/Ninja Frog/Hit (32x32).png",
+    32,
+    32
+  ),
 };
 
 var jugador = {
@@ -31,6 +36,7 @@ var jugador = {
   sprites: spritesJugador,
   puede: {
     saltar: false,
+    caer: true,
   },
 };
 
